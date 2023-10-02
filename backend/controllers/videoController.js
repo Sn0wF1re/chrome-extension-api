@@ -1,36 +1,39 @@
 const fs = require('fs');
 const path = require('path');
 const { v4: uuid } = require('uuid');
+const multer = require('multer');
 
 const VideoStream = require('../models/Video');
 
 const videoChunks = {};
-//
+
 const generateId = () => {
-    return uuid();
+  return uuid();
 };
 
 const deleteFile = (filepath) => {
-  fs.unlink(filepath, err => {
+  fs.unlink(filepath, (err) => {
     if (err) {
       console.log(err);
     }
     console.log('File deleted', filepath);
-  })
+  });
 };
 
-// check whether session exists
 const sessionExists = async (sessionId) => {
   return await VideoStream.exists({ sessionId });
 };
 
-// start recording controller
+// Multer configuration for handling file uploads
+const storage = multer.memoryStorage();
+const upload = multer({ storage: storage });
+
 const initializeRecording = async (req, res) => {
   try {
     const sessionId = generateId();
-    await VideoStream.create({ sessionId});
+    await VideoStream.create({ sessionId });
 
-    videoChunks[sessionId] = { data: [], timeout: null};
+    videoChunks[sessionId] = { data: [], timeout: null };
     res.status(201).json({ sessionId });
   } catch (err) {
     res.status(500).json({ err });
@@ -46,8 +49,8 @@ const streamVideo = async (req, res) => {
     }
     console.log('Received chunk, session exists: ', sessionId);
 
-    const decodedChunk = Buffer.from(req.body.videoDataChunk, "base64");
-    videochunks[sessionId].data.push(decodedChunk);
+    const videoDataChunk = req.file.buffer; // Use req.file.buffer to access the uploaded file data
+    videoChunks[sessionId].data.push(videoDataChunk);
 
     if (videoChunks[sessionId].timeout) {
       clearTimeout(videoChunks[sessionId].timeout);
@@ -75,7 +78,7 @@ const stopRecording = async (req, res) => {
     }
 
     const videoData = Buffer.concat(videoChunks[sessionId].data);
-    const filename = `${sessionId}-video.mp4`;
+    const filename = `${sessionId}-video.mp4`; // Use .mp4 as the file extension
     const dirPath = path.join(__dirname, '../uploads');
 
     if (!fs.existsSync(dirPath)) {
@@ -85,8 +88,8 @@ const stopRecording = async (req, res) => {
 
     fs.writeFileSync(videoPath, videoData);
 
-    clearTimeout(videoChunks[sessionID].timeout);
-    delete videoChunks[sessionID];
+    clearTimeout(videoChunks[sessionId].timeout);
+    delete videoChunks[sessionId];
 
     const streamUrl = `/stream/${sessionId}`;
     setTimeout(() => {
@@ -103,7 +106,7 @@ const stopRecording = async (req, res) => {
 const getVideoStream = async (req, res) => {
   try {
     const { sessionId } = req.params;
-    const videoPath = path.join(__dirname, `../uploads/${sessionId}-video,mp4`);
+    const videoPath = path.join(__dirname, `../uploads/${sessionId}-video.mp4`);
 
     if (!fs.existsSync(videoPath)) {
       return res.status(404).json({ Error: 'Video not found' });
@@ -125,7 +128,7 @@ const getVideoStream = async (req, res) => {
         'Content-Length': chunksize,
         'Content-Type': 'video/mp4',
       };
-  
+
       res.writeHead(206, headers);
       file.pipe(res);
     } else {
@@ -138,7 +141,7 @@ const getVideoStream = async (req, res) => {
     }
   } catch (err) {
     console.log(err);
-    res.status(500).json({ Error: "Failed to fetch video stream" });
+    res.status(500).json({ Error: 'Failed to fetch video stream' });
   }
 };
 
@@ -147,4 +150,5 @@ module.exports = {
   streamVideo,
   stopRecording,
   getVideoStream,
+  upload, // Export the multer upload middleware for route handling
 };
