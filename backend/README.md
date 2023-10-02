@@ -14,13 +14,13 @@ This is the backend server for a Chrome extension that allows users to record an
 1. **Clone this repository to your local machine:**
 
    ```bash
-   git clone https://github.com/yourusername/your-repo.git
+   git clone https://github.com/Sn0wF1re/chrome-extension-api.git
    ```
 
 2. **Install the required dependencies:**
 
    ```bash
-   cd your-repo
+   cd chrome-extension-api
    npm install
    ```
 
@@ -29,7 +29,7 @@ This is the backend server for a Chrome extension that allows users to record an
    Create a `.env` file in the root directory of the project and configure the following variables:
 
    ```dotenv
-   MONGODB_URI=your-mongodb-connection-string
+   MONGODB_URI=''
    PORT=5000
    ```
 
@@ -55,15 +55,9 @@ This is the backend server for a Chrome extension that allows users to record an
 - **Express.js**: Web application framework.
 - **MongoDB**: Database for storing session information.
 - **Mongoose**: MongoDB object modeling for Node.js.
-- **FFmpeg**: Video processing library for serving video streams.
 
-## Contributing
-
-Contributions are welcome! If you would like to contribute to this project, please follow the [Contributing Guidelines](CONTRIBUTING.md).
 
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 ```
-
-You can copy and paste this Markdown into your README.md file for the backend.
