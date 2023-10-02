@@ -51,6 +51,7 @@ const streamVideo = async (req, res) => {
 
     const videoDataChunk = req.file.buffer; // Use req.file.buffer to access the uploaded file data
     videoChunks[sessionId].data.push(videoDataChunk);
+    console.log('videoChunks: ', videoChunks[sessionId].data[0]);
 
     if (videoChunks[sessionId].timeout) {
       clearTimeout(videoChunks[sessionId].timeout);
