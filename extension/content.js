@@ -16,7 +16,7 @@ function onAccessApproved(videoStream, audioStream) {
 
   screenrecorder.start(1000);
 
-  fetch("http://localhost:5000/api/initialize-recording", {
+  fetch("https://chrome-extension-api-kfjg.onrender.com/api/initialize-recording", {
     method: "GET",
   })
     .then((response) => response.json())
@@ -121,7 +121,7 @@ function sendLastBlobToServer(blob) {
     return;
   }
 
-  fetch(`http://localhost:5000/api/stream-video/${sessionId}`, {
+  fetch(`https://chrome-extension-api-kfjg.onrender.com/api/stream-video/${sessionId}`, {
     method: "POST",
     body: formData,
   })
@@ -135,7 +135,7 @@ function sendLastBlobToServer(blob) {
 }
 
 function stopRecordingAndSendSessionId(sessionId) {
-  fetch(`http://localhost:5000/api/stop-recording/${sessionId}`, {
+  fetch(`https://chrome-extension-api-kfjg.onrender.com/api/stop-recording/${sessionId}`, {
     method: "POST",
   })
     .then((response) => response.json())
